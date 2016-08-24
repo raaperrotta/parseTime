@@ -1,16 +1,17 @@
 function str = parseTime(seconds)
 % Parses a number in seconds into a human readable string of the following
-% units: {'year','month','week','day','hour','minute','second'}
+% units: {'year','week','day','hour','minute','second'}
 % 
 % Created by Robert Perrotta
 
-units = {'year','month','week','day','hour','minute','second'};
+% Will attach minus sign later if needed
+isneg = seconds < 0;
+seconds = abs(seconds);
+
+units = {'year','week','day','hour','minute','second'};
 
 years = floor(seconds/31536000);
 seconds = seconds - years*31536000;
-
-months = floor(seconds/2592000);
-seconds = seconds - months*2592000;
 
 weeks = floor(seconds/604800);
 seconds = seconds - weeks*604800;
@@ -24,8 +25,12 @@ seconds = seconds - hours*3600;
 minutes = floor(seconds/60);
 seconds = seconds - minutes*60;
 
-values = [years,months,weeks,days,hours,minutes,seconds];
+% only keep 2 digits of precision
+seconds = round(seconds,2);
 
+values = [years,weeks,days,hours,minutes,seconds];
+
+% Remove units attached to zeros
 i = values==0;
 if all(i)
     str = '0';
@@ -34,23 +39,28 @@ end
 values(i) = [];
 units(i) = [];
 
+% Append 's' to pluralize units as needed
 i = values~=1;
 units(i) = cellfun(@(unit)[unit,'s'],units(i),'UniformOutput',false);
 
-if length(units)>2
+if length(units)>2 % need commas (incl. Oxford comma) and 'and'
     units(1:end-1) = cellfun(@(unit)[unit,', '],units(1:end-1),'UniformOutput',false);
     units{end-1} = [units{end-1},'and '];
-elseif length(units)>1
+elseif length(units)>1 % don't need a comma, just an 'and'
     units{end-1} = [units{end-1},' and '];
 end
 
-for i=1:length(units)-1
+for i=1:length(units)-1 % only seconds can ever be non-integer
     units{i} = [num2sepstr(values(i),'%d'),' ',units{i}];
 end
-if strcmp(units{end},'seconds') || strcmp(units{end},'second')
+if mod(values(end),1) >= 0.005
     units{end} = [num2sepstr(values(end),'%.2f'),' ',units{end}];
 else
-    units{end} = [num2sepstr(values(end),'%d'),' ',units{end}];
+    units{end} = [num2sepstr(values(end),'%.0f'),' ',units{end}];
 end
 
 str = [units{:}];
+
+if isneg
+    str = ['-',str];
+end
