@@ -4,6 +4,9 @@ function str = parseTime(seconds)
 %
 % Created by Robert Perrotta
 
+% Should add optional precision specifier and determine auto-precision based on
+% input time, rather than just using 2 decimal places always.
+
 % Will attach minus sign later if needed
 isneg = seconds < 0;
 seconds = abs(seconds);
@@ -25,8 +28,9 @@ seconds = seconds - hours*3600;
 minutes = floor(seconds/60);
 seconds = seconds - minutes*60;
 
-% % only keep 2 digits of precision
-% seconds = round(seconds,2); % need round(seconds*100)/100 for 2014a and older
+% only keep 2 digits of precision
+% seconds = round(seconds,2); % Only works with R2014b and newer
+seconds = round(seconds*100)/100; % Works with R2014a and older, too
 
 values = [years,weeks,days,hours,minutes,seconds];
 
