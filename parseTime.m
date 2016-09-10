@@ -1,15 +1,31 @@
-function str = parseTime(seconds)
+function str = parseTime(seconds,precision)
 % Parses a number in seconds into a human readable string of the following
 % units: {'year','week','day','hour','minute','second'}
+% 
+% str = parseTime(seconds) converts the number of seconds input to a string
+%   representing that value in units of years, weeks, days, hours, minutes,
+%   and seconds.
+% 
+% str = parseTime(seconds,precision) additionally specifies the number of
+%   digits printed after the decimal point in seconds. If this is not
+%   specified, the seconds value is printed between zero and six digits
+%   past the decimal point to provide four significant digits.
 %
 % Created by Robert Perrotta
-
-% Should add optional precision specifier and determine auto-precision based on
-% input time, rather than just using 2 decimal places always.
 
 % Will attach minus sign later if needed
 isneg = seconds < 0;
 seconds = abs(seconds);
+
+if nargin == 1 % auto-determine precision
+    sig_figs = 4;
+    % account for possible rounding by 1/2 the decimal past the sig_figs
+    after_decimal = sig_figs - 1 - floor(log10(seconds+(10^-sig_figs)/2));
+    precision = max(min(after_decimal,6),0);
+else
+    assert(isscalar(precision)&mod(precision,1)==0&precision>=0,...
+        'Precision must be a non-negative integer!')
+end
 
 units = {'year','week','day','hour','minute','second'};
 
@@ -28,9 +44,8 @@ seconds = seconds - hours*3600;
 minutes = floor(seconds/60);
 seconds = seconds - minutes*60;
 
-% only keep 2 digits of precision
-% seconds = round(seconds,2); % Only works with R2014b and newer
-seconds = round(seconds*100)/100; % Works with R2014a and older, too
+% seconds = round(seconds,precision); % Only works with R2014b and newer
+seconds = round(seconds*10^precision)/10^precision; % Works with R2014a and older, too
 
 values = [years,weeks,days,hours,minutes,seconds];
 
@@ -57,10 +72,11 @@ end
 for i=1:length(units)-1 % only seconds can ever be non-integer
     units{i} = [num2sepstr(values(i),'%d'),' ',units{i}];
 end
-if mod(values(end),1) >= 0.005
-    units{end} = [num2sepstr(values(end),'%.2f'),' ',units{end}];
+
+if strcmp(units{end},'seconds') || strcmp(units{end},'second')
+    units{end} = [num2sepstr(values(end),['%.',num2str(precision),'f']),' ',units{end}];
 else
-    units{end} = [num2sepstr(values(end),'%.0f'),' ',units{end}];
+    units{end} = [num2sepstr(values(end),'%d'),' ',units{end}];
 end
 
 str = [units{:}];
