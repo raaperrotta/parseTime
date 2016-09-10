@@ -1,7 +1,7 @@
 function str = parseTime(seconds)
 % Parses a number in seconds into a human readable string of the following
 % units: {'year','week','day','hour','minute','second'}
-% 
+%
 % Created by Robert Perrotta
 
 % Will attach minus sign later if needed
@@ -25,8 +25,8 @@ seconds = seconds - hours*3600;
 minutes = floor(seconds/60);
 seconds = seconds - minutes*60;
 
-% only keep 2 digits of precision
-seconds = round(seconds,2);
+% % only keep 2 digits of precision
+% seconds = round(seconds,2); % need round(seconds*100)/100 for 2014a and older
 
 values = [years,weeks,days,hours,minutes,seconds];
 
