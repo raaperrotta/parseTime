@@ -69,14 +69,22 @@ elseif length(units)>1 % don't need a comma, just an 'and'
     units{end-1} = [units{end-1},' and '];
 end
 
+% Use num2sepstr if present. Otherwise use num2str.
+% (only years could be >= 1,000)
+if isempty(which('num2sepstr'))
+    tostr = @(varargin) num2str(varargin{:});
+else
+    tostr = @(varargin) num2sepstr(varargin{:});
+end
+
 for i=1:length(units)-1 % only seconds can ever be non-integer
-    units{i} = [num2sepstr(values(i),'%d'),' ',units{i}];
+    units{i} = [tostr(values(i),'%d'),' ',units{i}];
 end
 
 if strcmp(units{end},'seconds')
-    units{end} = [num2sepstr(values(end),['%.',num2str(precision),'f']),' ',units{end}];
+    units{end} = [num2str(values(end),['%.',num2str(precision),'f']),' ',units{end}];
 else
-    units{end} = [num2sepstr(values(end),'%d'),' ',units{end}];
+    units{end} = [tostr(values(end),'%d'),' ',units{end}];
 end
 
 str = [units{:}];
