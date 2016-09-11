@@ -58,8 +58,8 @@ end
 values(i) = [];
 units(i) = [];
 
-% Append 's' to pluralize units as needed
-i = values~=1;
+% Append 's' to pluralize units as needed (seconds are always plural)
+i = values~=1 | strcmp(units,'second');
 units(i) = cellfun(@(unit)[unit,'s'],units(i),'UniformOutput',false);
 
 if length(units)>2 % need commas (incl. Oxford comma) and 'and'
@@ -73,7 +73,7 @@ for i=1:length(units)-1 % only seconds can ever be non-integer
     units{i} = [num2sepstr(values(i),'%d'),' ',units{i}];
 end
 
-if strcmp(units{end},'seconds') || strcmp(units{end},'second')
+if strcmp(units{end},'seconds')
     units{end} = [num2sepstr(values(end),['%.',num2str(precision),'f']),' ',units{end}];
 else
     units{end} = [num2sepstr(values(end),'%d'),' ',units{end}];
