@@ -13,6 +13,18 @@ function str = parseTime(seconds,precision)
 %
 % Created by Robert Perrotta
 
+% If input is array, return cell with results of each called separately
+if numel(seconds) > 1
+    if nargin == 1
+        str = arrayfun(@(x) parseTime(x), seconds, ...
+            'Uniform', false);
+    else
+        str = arrayfun(@(x) parseTime(x, precision), seconds, ...
+            'Uniform', false);
+    end
+    return
+end
+
 % Will attach minus sign later if needed
 isneg = seconds < 0;
 seconds = abs(seconds);
