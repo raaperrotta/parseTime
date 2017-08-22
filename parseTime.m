@@ -13,6 +13,18 @@ function str = parseTime(seconds,precision)
 %
 % Created by Robert Perrotta
 
+% If input is array, return cell with results of each called separately
+if numel(seconds) > 1
+    if nargin == 1
+        str = arrayfun(@(x) parseTime(x), seconds, ...
+            'Uniform', false);
+    else
+        str = arrayfun(@(x) parseTime(x, precision), seconds, ...
+            'Uniform', false);
+    end
+    return
+end
+
 % Will attach minus sign later if needed
 isneg = seconds < 0;
 seconds = abs(seconds);
@@ -21,13 +33,13 @@ if nargin == 1 % auto-determine precision
     sig_figs = 4;
     % account for possible rounding by 1/2 the decimal past the sig_figs
     after_decimal = sig_figs - 1 - floor(log10(seconds+(10^-sig_figs)/2));
-    precision = max(min(after_decimal,6),0);
+    precision = max(min(after_decimal, 6), 0);
 else
-    assert(isscalar(precision)&mod(precision,1)==0&precision>=0,...
+    assert(isscalar(precision) & mod(precision,1)==0 & precision>=0, ...
         'Precision must be a non-negative integer!')
 end
 
-units = {'year','week','day','hour','minute','second'};
+units = {'year', 'week', 'day', 'hour', 'minute', 'second'};
 
 years = floor(seconds/31536000);
 seconds = seconds - years*31536000;
@@ -47,7 +59,7 @@ seconds = seconds - minutes*60;
 % seconds = round(seconds,precision); % Only works with R2014b and newer
 seconds = round(seconds*10^precision)/10^precision; % Works with R2014a and older, too
 
-values = [years,weeks,days,hours,minutes,seconds];
+values = [years, weeks, days, hours, minutes, seconds];
 
 % Remove units attached to zeros
 i = values==0;
@@ -58,8 +70,9 @@ end
 values(i) = [];
 units(i) = [];
 
-% Append 's' to pluralize units as needed (seconds are always plural)
-i = values~=1 | strcmp(units,'second');
+% Append 's' to pluralize units as needed
+% Seconds are always plural unless precision is 0 and value is 1
+i = values~=1 | (strcmp(units,'second') & precision~=0);
 units(i) = cellfun(@(unit)[unit,'s'],units(i),'UniformOutput',false);
 
 if length(units)>2 % need commas (incl. Oxford comma) and 'and'
