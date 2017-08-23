@@ -50,3 +50,11 @@ verifyEqual(testCase,parseTime(0.99995),'1.000 seconds')
 verifyEqual(testCase,parseTime(-0.99995),'-1.000 seconds')
 verifyEqual(testCase,parseTime(-9.9995),'-10.000 seconds')
 end
+function testWithNum2SepStr(testCase)
+assumeNotEmpty(testCase, which('num2sepstr.m'), ...
+    'Could not find num2sepstr to use in this test.')
+verifyEqual(testCase,parseTime(1-3600*24*365),'-52 weeks, 23 hours, 59 minutes, and 59 seconds')
+verifyEqual(testCase,parseTime(1e12),'31,709 years, 41 weeks, 2 days, 1 hour, 46 minutes, and 40 seconds')
+verifyEqual(testCase,parseTime(-1e12),'-31,709 years, 41 weeks, 2 days, 1 hour, 46 minutes, and 40 seconds')
+verifyEqual(testCase,parseTime(1e6*365*3600*24),'1,000,000 years')
+end
