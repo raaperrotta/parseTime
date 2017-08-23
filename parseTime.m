@@ -13,6 +13,15 @@ function str = parseTime(seconds,precision)
 %
 % Created by Robert Perrotta
 
+% Check inputs
+assert(isnumeric(seconds), 'parseTime:badSeconds', ...
+    'Seconds must be a number or array of numbers.')
+if nargin >= 2
+    assert(isscalar(precision) & mod(precision,1)==0 & precision>=0, ...
+         'parseTime:badPrecision', ...
+         'Precision must be a non-negative integer!')
+end
+
 % If input is array, return cell with results of each called separately
 if numel(seconds) > 1
     if nargin == 1
@@ -34,9 +43,6 @@ if nargin == 1 % auto-determine precision
     % account for possible rounding by 1/2 the decimal past the sig_figs
     after_decimal = sig_figs - 1 - floor(log10(seconds+(10^-sig_figs)/2));
     precision = max(min(after_decimal, 6), 0);
-else
-    assert(isscalar(precision) & mod(precision,1)==0 & precision>=0, ...
-        'Precision must be a non-negative integer!')
 end
 
 units = {'year', 'week', 'day', 'hour', 'minute', 'second'};

@@ -58,3 +58,9 @@ verifyEqual(testCase,parseTime(1e12),'31,709 years, 41 weeks, 2 days, 1 hour, 46
 verifyEqual(testCase,parseTime(-1e12),'-31,709 years, 41 weeks, 2 days, 1 hour, 46 minutes, and 40 seconds')
 verifyEqual(testCase,parseTime(1e6*365*3600*24),'1,000,000 years')
 end
+function testBadInputErrors(testCase)
+verifyError(testCase, @() parseTime('Hello!'), 'parseTime:badSeconds')
+verifyError(testCase, @() parseTime('Hello!', 1), 'parseTime:badSeconds')
+verifyError(testCase, @() parseTime(1, -1), 'parseTime:badPrecision')
+verifyError(testCase, @() parseTime(1, 1.1), 'parseTime:badPrecision')
+end
