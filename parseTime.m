@@ -71,11 +71,6 @@ seconds = seconds - hours*3600;
 minutes = floor(seconds/60);
 seconds = seconds - minutes*60;
 
-if isfloat(seconds)
-    % seconds = round(seconds,precision); % Only works with R2014b and newer
-    seconds = round(seconds*10^precision)/10^precision; % Works with R2014a and older, too
-end
-
 values = [years, weeks, days, hours, minutes, seconds];
 
 % Remove units attached to zeros
